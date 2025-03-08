@@ -59,15 +59,12 @@ end
 
 -- Teleporte para as coordenadas
 -- **IMPORTANTE:** Adapte as coordenadas para o Mini City!  Estas são apenas exemplos.
+-- Use as ferramentas do Roblox Studio para obter as coordenadas corretas.
 local locations = {
-	["Prédio"] = Vector3.new(-1888.3, 4.8, 377.2), -- EXEMPLO
-	["Casa Pescaria"] = Vector3.new(-1205.7, 79.1, -391.0), -- EXEMPLO
-	["Gas/Lixo"] = Vector3.new(-441.9, 5.3, -31.0), -- EXEMPLO
-	["Fazenda"] = Vector3.new(778.8, 4.8, -101.1), -- EXEMPLO
-	["PM"] = Vector3.new(-839.3, 12.2, 459.0), -- EXEMPLO
-	["Praça"] = Vector3.new(-287.4, 4.8, 338.5), -- EXEMPLO
-	["Plantas"] = Vector3.new(12022.6, 27.3, 12796.3), -- EXEMPLO
-	["Lavagem"] = Vector3.new(19830.8, 66.5, 13142.8) -- EXEMPLO
+	["Local 1"] = Vector3.new(0, 0, 0), -- SUBSTITUA POR COORDENADAS REAIS
+	["Local 2"] = Vector3.new(0, 0, 0), -- SUBSTITUA POR COORDENADAS REAIS
+	["Local 3"] = Vector3.new(0, 0, 0), -- SUBSTITUA POR COORDENADAS REAIS
+	["Local 4"] = Vector3.new(0, 0, 0), -- SUBSTITUA POR COORDENADAS REAIS
 }
 
 -- Criar botões de teleporte
@@ -113,24 +110,58 @@ local espEnabled = false
 local function toggleESP()
 	espEnabled = not espEnabled
 	print("ESP: " .. tostring(espEnabled))
-	-- **IMPLEMENTAÇÃO DO ESP:** Esta é uma função PLACEHOLDER. Você precisará implementar a lógica do ESP.
-	-- Sugestão:  Criar um script que adiciona outlines ou bordas brilhantes aos personagens visíveis.
+	-- **IMPLEMENTAÇÃO DO ESP:**
+	-- Adicione o código para criar um efeito ESP aqui.
+	-- Por exemplo, você pode criar um contorno ao redor dos jogadores visíveis.
+	-- Este é um exemplo básico:
+	for i, v in pairs(game.Players:GetPlayers()) do
+		if v ~= player and v.Character and v.Character:FindFirstChild("Humanoid") then
+			local highlight = Instance.new("Highlight")
+			highlight.Parent = v.Character
+			highlight.OutlineColor = Color3.new(1, 0, 0) -- Vermelho
+			highlight.Enabled = espEnabled
+		end
+	end
 end
 
 local noClipEnabled = false
 local function toggleNoClip()
 	noClipEnabled = not noClipEnabled
 	print("NoClip: " .. tostring(noClipEnabled))
-	-- **IMPLEMENTAÇÃO DO NOCLIP:** Esta é uma função PLACEHOLDER.  Requer manipulação de colisão do personagem.
-	-- Sugestão: Desabilitar a colisão do HumanoidRootPart ou usar um BodyVelocity/AssemblyLinearVelocity.
+	-- **IMPLEMENTAÇÃO DO NOCLIP:**
+	-- Adicione o código para desabilitar a colisão do personagem aqui.
+	-- Este é um exemplo básico:
+	if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+		player.Character.HumanoidRootPart.CanCollide = not noClipEnabled
+	end
 end
 
 local hitBoxEnabled = false
 local function toggleHitBox()
 	hitBoxEnabled = not hitBoxEnabled
 	print("HitBox: " .. tostring(hitBoxEnabled))
-	-- **IMPLEMENTAÇÃO DO HITBOX:** Esta é uma função PLACEHOLDER.  Envolve visualização da hitbox do personagem.
-	-- Sugestão: Criar partes transparentes ao redor do personagem para representar a hitbox.
+	-- **IMPLEMENTAÇÃO DO HITBOX:**
+	-- Adicione o código para mostrar a hitbox do personagem aqui.
+	-- Este é um exemplo básico:
+	if player.Character and player.Character:FindFirstChild("Humanoid") then
+		-- Supondo que a hitbox seja um cubo simples
+		local hitboxPart = Instance.new("Part")
+		hitboxPart.Size = Vector3.new(3, 6, 3) -- Tamanho aproximado da hitbox
+		hitboxPart.Transparency = 0.5
+		hitboxPart.CanCollide = false
+		hitboxPart.Anchored = true
+		hitboxPart.Parent = player.Character
+		hitboxPart.Name = "HitBoxVisual"
+		hitboxPart.CFrame = player.Character.HumanoidRootPart.CFrame
+		hitboxPart.Visible = hitBoxEnabled
+
+		-- Desativar a HitBox
+		if not hitBoxEnabled then
+			if player.Character:FindFirstChild("HitBoxVisual") then
+				player.Character:FindFirstChild("HitBoxVisual"):Destroy()
+			end
+		end
+	end
 end
 
 -- Criar botões para as funções
@@ -156,7 +187,9 @@ espButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 espButton.Font = Enum.Font.SourceSans
 espButton.BorderSizePixel = 0
 espButton.Parent = frame
-espButton.MouseButton1Click:Connect(toggleESP)
+espButton.MouseButton1Click:Connect(function()
+    toggleESP()
+end)
 
 local noClipButton = Instance.new("TextButton")
 noClipButton.Size = UDim2.new(0, 0.8, 0, 30)
@@ -167,7 +200,9 @@ noClipButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 noClipButton.Font = Enum.Font.SourceSans
 noClipButton.BorderSizePixel = 0
 noClipButton.Parent = frame
-noClipButton.MouseButton1Click:Connect(toggleNoClip)
+noClipButton.MouseButton1Click:Connect(function()
+    toggleNoClip()
+end)
 
 local hitBoxButton = Instance.new("TextButton")
 hitBoxButton.Size = UDim2.new(0, 0.8, 0, 30)
@@ -178,6 +213,8 @@ hitBoxButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 hitBoxButton.Font = Enum.Font.SourceSans
 hitBoxButton.BorderSizePixel = 0
 hitBoxButton.Parent = frame
-hitBoxButton.MouseButton1Click:Connect(toggleHitBox)
+hitBoxButton.MouseButton1Click:Connect(function()
+    toggleHitBox()
+end)
 
 print("Mini Menu Grátis carregado!")
