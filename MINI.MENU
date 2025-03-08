@@ -1,0 +1,183 @@
+-- Mini Menu Grátis para Mini City (PC e Mobile)
+--[[
+    Este script cria um menu simples com funcionalidades de teleporte, speed, ESP, noclip e hitbox.
+    Ele foi projetado para funcionar tanto em PC quanto em dispositivos móveis no Roblox.
+    **AVISO:** Use com responsabilidade e em jogos onde você tem permissão para modificar a jogabilidade.
+]]
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Cria a ScreenGui
+local menu = Instance.new("ScreenGui")
+menu.Name = "MiniMenuGratis"
+menu.Parent = playerGui
+menu.ResetOnSpawn = false -- Garante que o menu não resete quando o personagem respawnar
+
+-- Cria o frame principal
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 250, 0, 350) -- Tamanho ajustado para melhor visualização
+frame.Position = UDim2.new(0.05, 0, 0.05, 0) -- Posição no canto superior esquerdo
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.BorderSizePixel = 0
+frame.Parent = menu
+frame.Active = true
+frame.Draggable = true -- Permite arrastar o menu
+
+-- Cria o botão de minimizar
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -35, 0, 5)
+minimizeButton.Text = "-"
+minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+minimizeButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+minimizeButton.Font = Enum.Font.SourceSansBold
+minimizeButton.BorderSizePixel = 0
+minimizeButton.Parent = frame
+
+minimizeButton.MouseButton1Click:Connect(function()
+	frame.Visible = not frame.Visible
+end)
+
+-- Função para teleportar
+local function teleportTo(coords)
+	if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+		player.Character.HumanoidRootPart.CFrame = CFrame.new(coords)
+    else
+        print("HumanoidRootPart não encontrado! Aguardando...")
+        player.CharacterAdded:Connect(function(character)
+            -- Espera um pouco para garantir que o HumanoidRootPart seja criado
+            wait(1)
+            if character:FindFirstChild("HumanoidRootPart") then
+               character.HumanoidRootPart.CFrame = CFrame.new(coords)
+            else
+               print("HumanoidRootPart ainda não encontrado!")
+            end
+        end)
+    end
+end
+
+-- Teleporte para as coordenadas
+-- **IMPORTANTE:** Adapte as coordenadas para o Mini City!  Estas são apenas exemplos.
+local locations = {
+	["Prédio"] = Vector3.new(-1888.3, 4.8, 377.2), -- EXEMPLO
+	["Casa Pescaria"] = Vector3.new(-1205.7, 79.1, -391.0), -- EXEMPLO
+	["Gas/Lixo"] = Vector3.new(-441.9, 5.3, -31.0), -- EXEMPLO
+	["Fazenda"] = Vector3.new(778.8, 4.8, -101.1), -- EXEMPLO
+	["PM"] = Vector3.new(-839.3, 12.2, 459.0), -- EXEMPLO
+	["Praça"] = Vector3.new(-287.4, 4.8, 338.5), -- EXEMPLO
+	["Plantas"] = Vector3.new(12022.6, 27.3, 12796.3), -- EXEMPLO
+	["Lavagem"] = Vector3.new(19830.8, 66.5, 13142.8) -- EXEMPLO
+}
+
+-- Criar botões de teleporte
+local i = 1
+for name, coords in pairs(locations) do
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(0, 0.8, 0, 30) -- Tamanho ajustado e responsivo
+	button.Position = UDim2.new(0.1, 0, 0, 35 * i)
+	button.Text = name
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+	button.Font = Enum.Font.SourceSans
+    button.BorderSizePixel = 0
+	button.Parent = frame
+
+	button.MouseButton1Click:Connect(function()
+		teleportTo(coords)
+	end)
+	i = i + 1
+end
+
+-- Funções de ativação (Implementações básicas)
+local speedEnabled = false
+local function toggleSpeed()
+	speedEnabled = not speedEnabled
+	print("Speed: " .. tostring(speedEnabled))
+	if player.Character and player.Character:FindFirstChild("Humanoid") then
+		player.Character.Humanoid.WalkSpeed = speedEnabled and 32 or 16  -- Aumenta a velocidade se ativado
+	else
+        print("Humanoid não encontrado! Aguardando...")
+        player.CharacterAdded:Connect(function(character)
+            wait(1) -- Espera um pouco para o Humanoid ser criado
+            if character:FindFirstChild("Humanoid") then
+               character.Humanoid.WalkSpeed = speedEnabled and 32 or 16
+            else
+               print("Humanoid ainda não encontrado!")
+            end
+        end)
+    end
+end
+
+local espEnabled = false
+local function toggleESP()
+	espEnabled = not espEnabled
+	print("ESP: " .. tostring(espEnabled))
+	-- **IMPLEMENTAÇÃO DO ESP:** Esta é uma função PLACEHOLDER. Você precisará implementar a lógica do ESP.
+	-- Sugestão:  Criar um script que adiciona outlines ou bordas brilhantes aos personagens visíveis.
+end
+
+local noClipEnabled = false
+local function toggleNoClip()
+	noClipEnabled = not noClipEnabled
+	print("NoClip: " .. tostring(noClipEnabled))
+	-- **IMPLEMENTAÇÃO DO NOCLIP:** Esta é uma função PLACEHOLDER.  Requer manipulação de colisão do personagem.
+	-- Sugestão: Desabilitar a colisão do HumanoidRootPart ou usar um BodyVelocity/AssemblyLinearVelocity.
+end
+
+local hitBoxEnabled = false
+local function toggleHitBox()
+	hitBoxEnabled = not hitBoxEnabled
+	print("HitBox: " .. tostring(hitBoxEnabled))
+	-- **IMPLEMENTAÇÃO DO HITBOX:** Esta é uma função PLACEHOLDER.  Envolve visualização da hitbox do personagem.
+	-- Sugestão: Criar partes transparentes ao redor do personagem para representar a hitbox.
+end
+
+-- Criar botões para as funções
+local buttonY = 35 * i -- Posiciona os botões abaixo dos botões de teleporte
+
+local speedButton = Instance.new("TextButton")
+speedButton.Size = UDim2.new(0, 0.8, 0, 30)
+speedButton.Position = UDim2.new(0.1, 0, 0, buttonY + 35)
+speedButton.Text = "Speed"
+speedButton.TextColor3 = Color3.new(1, 1, 1)
+speedButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+speedButton.Font = Enum.Font.SourceSans
+speedButton.BorderSizePixel = 0
+speedButton.Parent = frame
+speedButton.MouseButton1Click:Connect(toggleSpeed)
+
+local espButton = Instance.new("TextButton")
+espButton.Size = UDim2.new(0, 0.8, 0, 30)
+espButton.Position = UDim2.new(0.1, 0, 0, buttonY + 70)
+espButton.Text = "ESP"
+espButton.TextColor3 = Color3.new(1, 1, 1)
+espButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+espButton.Font = Enum.Font.SourceSans
+espButton.BorderSizePixel = 0
+espButton.Parent = frame
+espButton.MouseButton1Click:Connect(toggleESP)
+
+local noClipButton = Instance.new("TextButton")
+noClipButton.Size = UDim2.new(0, 0.8, 0, 30)
+noClipButton.Position = UDim2.new(0.1, 0, 0, buttonY + 105)
+noClipButton.Text = "NoClip"
+noClipButton.TextColor3 = Color3.new(1, 1, 1)
+noClipButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+noClipButton.Font = Enum.Font.SourceSans
+noClipButton.BorderSizePixel = 0
+noClipButton.Parent = frame
+noClipButton.MouseButton1Click:Connect(toggleNoClip)
+
+local hitBoxButton = Instance.new("TextButton")
+hitBoxButton.Size = UDim2.new(0, 0.8, 0, 30)
+hitBoxButton.Position = UDim2.new(0.1, 0, 0, buttonY + 140)
+hitBoxButton.Text = "HitBox"
+hitBoxButton.TextColor3 = Color3.new(1, 1, 1)
+hitBoxButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+hitBoxButton.Font = Enum.Font.SourceSans
+hitBoxButton.BorderSizePixel = 0
+hitBoxButton.Parent = frame
+hitBoxButton.MouseButton1Click:Connect(toggleHitBox)
+
+print("Mini Menu Grátis carregado!")
